@@ -18,7 +18,7 @@ namespace TooManyOrbits
 		private ConfigurationWindow m_window;
 		private Configuration m_configuration;
 		private IVisibilityController m_visibilityController;
-		private bool m_lastVisibilityState;
+		private bool m_lastVisibilityState = true;
 
 		public void Start()
 		{
