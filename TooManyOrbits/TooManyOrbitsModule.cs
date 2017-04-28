@@ -44,6 +44,9 @@ namespace TooManyOrbits
 			// get notifcations when player changes to map view
 			MapView.OnEnterMapView += OnEnterMapView;
 			MapView.OnExitMapView += OnExitMapView;
+
+			// disable script until woken up by entering map view
+			enabled = false;
 		}
 
 		[SuppressMessage("ReSharper", "DelegateSubtraction")]
