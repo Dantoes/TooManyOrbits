@@ -55,6 +55,9 @@ namespace TooManyOrbits
 			Logger.Debug("Disposing OrbitVisibilityController");
 			m_visibilityController.Dispose();
 
+			Logger.Debug("Disposing ToolbarButton");
+			m_toolbarButton.Dispose();
+
 			Logger.Debug("Writing configuration file");
 			ConfigurationParser.SaveToFile(ConfigurationFile, m_configuration);
 		}

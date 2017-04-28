@@ -1,9 +1,10 @@
-﻿using KSP.UI.Screens;
+﻿using System;
+using KSP.UI.Screens;
 using UnityEngine;
 
 namespace TooManyOrbits.UI
 {
-	internal class ToolbarButton
+	internal class ToolbarButton : IDisposable
 	{
 		public event Callback OnEnable, OnDisable;
 
@@ -17,6 +18,11 @@ namespace TooManyOrbits.UI
 			{
 				Logger.Error("Incorrect icon path");
 			}
+		}
+
+		public void Dispose()
+		{
+			Hide();
 		}
 
 		public void Show()
