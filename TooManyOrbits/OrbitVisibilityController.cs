@@ -12,6 +12,7 @@ namespace TooManyOrbits
 
 		private CommandSet m_hideOrbitCommands;
 
+		public event Callback<bool> OnVisibilityChanged;
 		public bool IsVisible { get; private set; }
 
 		public OrbitVisibilityController(Configuration configuration)
@@ -51,6 +52,7 @@ namespace TooManyOrbits
 			m_hideOrbitCommands.Undo();
 			m_hideOrbitCommands = new CommandSet();
 			IsVisible = true;
+			OnVisibilityChanged?.Invoke(true);
 		}
 
 		public void Hide()
@@ -65,6 +67,7 @@ namespace TooManyOrbits
 			CreateHideBodiesCommands(m_hideOrbitCommands);
 			m_hideOrbitCommands.Execute();
 			IsVisible = false;
+			OnVisibilityChanged?.Invoke(false);
 		}
 
 		public void Toggle()

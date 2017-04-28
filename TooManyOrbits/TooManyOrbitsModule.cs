@@ -20,7 +20,7 @@ namespace TooManyOrbits
 		private IVisibilityController m_visibilityController;
 		private bool m_lastVisibilityState = true;
 
-		public void Start()
+		private void Start()
 		{
 			Logger.Info($"Starting {ModName} v{Version}...");
 
@@ -29,6 +29,7 @@ namespace TooManyOrbits
 
 			Logger.Debug("Setting up OrbitVisibilityController");
 			m_visibilityController = new OrbitVisibilityController(m_configuration);
+			m_visibilityController.OnVisibilityChanged += OnOrbitVisibilityChanged;
 
 			// setup window
 			Logger.Debug("Creating window");
@@ -53,6 +54,7 @@ namespace TooManyOrbits
 			MapView.OnExitMapView -= OnExitMapView;
 
 			Logger.Debug("Disposing OrbitVisibilityController");
+			m_visibilityController.OnVisibilityChanged -= OnOrbitVisibilityChanged;
 			m_visibilityController.Dispose();
 
 			Logger.Debug("Disposing ToolbarButton");
@@ -62,7 +64,7 @@ namespace TooManyOrbits
 			ConfigurationParser.SaveToFile(ConfigurationFile, m_configuration);
 		}
 
-		public void Update()
+		private void Update()
 		{
 			if (Input.GetKeyDown(ToggleButton))
 			{
@@ -73,21 +75,33 @@ namespace TooManyOrbits
 		private void OnEnterMapView()
 		{
 			Logger.Debug("Enabling...");
+			enabled = true;
+
 			if (!m_lastVisibilityState)
 			{
 				m_visibilityController.Hide();
 			}
 			m_toolbarButton.Show();
-			enabled = true;
 		}
 
 		private void OnExitMapView()
 		{
 			Logger.Debug("Disabling...");
+			enabled = false;
+
 			m_lastVisibilityState = m_visibilityController.IsVisible;
 			m_visibilityController.Show();
 			m_toolbarButton.Hide();
-			enabled = false;
+		}
+
+		private void OnOrbitVisibilityChanged(bool orbitsVisible)
+		{
+			const float duration = 1.5f;
+			if (enabled)
+			{
+				var message = orbitsVisible ? "Orbits shown" : "Orbits hidden";
+				ScreenMessages.PostScreenMessage(message, duration);
+			}
 		}
 
 		private void OnGUI()
