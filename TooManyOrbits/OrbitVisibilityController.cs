@@ -89,7 +89,7 @@ namespace TooManyOrbits
 			{
 				var vessel = vessels[i];
 				var needCommand = m_configuration.HideVesselIcons | m_configuration.HideVesselOrbits;
-				if (needCommand && m_vesselFilter.Accect(vessel))
+				if (needCommand && m_vesselFilter.Accept(vessel))
 				{
 					var command = new HideOrbitCommand(vessel.orbitRenderer, m_configuration.HideVesselIcons, m_configuration.HideVesselOrbits);
 					commands.Add(command);
@@ -104,7 +104,7 @@ namespace TooManyOrbits
 			{
 				var body = bodies[i];
 				var needCommand = m_configuration.HideCelestialBodyIcons | m_configuration.HideCelestialBodyOrbits;
-				if (needCommand && m_celestialBodyFilter.Accect(body))
+				if (needCommand && m_celestialBodyFilter.Accept(body))
 				{
 					var command = new HideOrbitCommand(body.GetOrbitDriver().Renderer, m_configuration.HideCelestialBodyIcons, m_configuration.HideCelestialBodyOrbits);
 					commands.Add(command);

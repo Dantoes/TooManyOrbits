@@ -2,7 +2,7 @@
 {
 	internal class CelestialBodyFilter : IFilter<CelestialBody>
 	{
-		public bool Accect(CelestialBody obj)
+		public bool Accept(CelestialBody obj)
 		{
 			var targetedCelestialBody = FlightGlobals.ActiveVessel.targetObject?.GetOrbitDriver().celestialBody;
 			if (obj == targetedCelestialBody)

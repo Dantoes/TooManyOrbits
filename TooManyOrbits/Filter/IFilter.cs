@@ -2,6 +2,6 @@
 {
 	internal interface IFilter<in T>
 	{
-		bool Accect(T obj);
+		bool Accept(T obj);
 	}
 }

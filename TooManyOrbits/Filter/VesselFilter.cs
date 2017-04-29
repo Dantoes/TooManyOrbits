@@ -2,7 +2,7 @@
 {
 	internal class VesselFilter : IFilter<Vessel>
 	{
-		public bool Accect(Vessel obj)
+		public bool Accept(Vessel obj)
 		{
 			if (obj == null)
 			{
