@@ -7,6 +7,7 @@ namespace TooManyOrbits
 		private readonly string m_resourcePath;
 
 		public Texture ToolbarIcon => LoadTextureResource("ToolbarIcon");
+		public Texture PencilIcon => LoadTextureResource("Pencil");
 
 		public ResourceProvider(string resourcePath)
 		{

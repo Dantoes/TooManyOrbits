@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using TooManyOrbits.UI;
 using UnityEngine;
@@ -9,16 +10,18 @@ namespace TooManyOrbits
     public class TooManyOrbitsModule : MonoBehaviour
 	{
 		public const string ModName = "TooManyOrbits";
-		private const KeyCode ToggleButton = KeyCode.F8;
+		public const string ResourcePath = ModName + "/";
 
 		private string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
 		private string ConfigurationFile => $"GameData/{ModName}/{ModName}.cfg";
 
+		private KeyCode m_toggleButton;
 		private ToolbarButton m_toolbarButton;
 		private ConfigurationWindow m_window;
 		private Configuration m_configuration;
 		private IVisibilityController m_visibilityController;
 		private bool m_lastVisibilityState = true;
+		private bool m_skipUpdate = false;
 
 		private void Start()
 		{
@@ -28,6 +31,8 @@ namespace TooManyOrbits
 
 			Logger.Debug("Loading configuration");
 			m_configuration = ConfigurationParser.LoadFromFile(ConfigurationFile);
+			m_configuration.PropertyChanged += OnConfigurationChanged;
+			m_toggleButton = m_configuration.ToggleKey;
 
 			Logger.Debug("Setting up OrbitVisibilityController");
 			m_visibilityController = new OrbitVisibilityController(m_configuration);
@@ -35,7 +40,7 @@ namespace TooManyOrbits
 
 			// setup window
 			Logger.Debug("Creating window");
-			m_window = new ConfigurationWindow($"{ModName} Configuration", m_configuration, m_visibilityController);
+			m_window = new ConfigurationWindow($"{ModName} Configuration", m_configuration, m_visibilityController, resourceProvider);
 
 			// setup toolbar button
 			Logger.Debug("Creating toolbar button");
@@ -71,7 +76,13 @@ namespace TooManyOrbits
 
 		private void Update()
 		{
-			if (Input.GetKeyDown(ToggleButton))
+			if (m_skipUpdate)
+			{
+				m_skipUpdate = false;
+				return;
+			}
+
+			if (Input.GetKeyDown(m_toggleButton))
 			{
 				m_visibilityController.Toggle();
 			}
@@ -117,6 +128,16 @@ namespace TooManyOrbits
 			m_window.Draw();
 
 			GUI.skin = originalSkin;
+		}
+
+		private void OnConfigurationChanged(object sender, PropertyChangedEventArgs args)
+		{
+			if (args?.PropertyName == nameof(Configuration.ToggleKey))
+			{
+				m_toggleButton = m_configuration.ToggleKey;
+				m_skipUpdate = true;
+				Logger.Info($"Changed toggle key to '{m_configuration.ToggleKey}'");
+			}
 		}
 	}
 }

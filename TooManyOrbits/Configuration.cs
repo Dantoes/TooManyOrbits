@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using UnityEngine;
 
 namespace TooManyOrbits
 {
@@ -32,6 +33,13 @@ namespace TooManyOrbits
 		{
 			get { return m_hideCelestialBodyOrbits; }
 			set { SetValue(ref m_hideCelestialBodyOrbits, value, nameof(HideCelestialBodyOrbits)); }
+		}
+
+		private KeyCode m_toggleKey;
+		public KeyCode ToggleKey
+		{
+			get { return m_toggleKey; }
+			set { SetValue(ref m_toggleKey, value, nameof(ToggleKey)); }
 		}
 
 		private void SetValue<T>(ref T field, T newValue, string propertyName)

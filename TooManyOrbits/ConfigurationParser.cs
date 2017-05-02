@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace TooManyOrbits
 {
@@ -22,6 +23,7 @@ namespace TooManyOrbits
 			RegisterConfigKey(nameof(Configuration.HideVesselOrbits), true, Convert.ToBoolean);
 			RegisterConfigKey(nameof(Configuration.HideCelestialBodyIcons), true, Convert.ToBoolean);
 			RegisterConfigKey(nameof(Configuration.HideCelestialBodyOrbits), false, Convert.ToBoolean);
+			RegisterConfigKey(nameof(Configuration.ToggleKey), KeyCode.F8, s => ParseEnum(s, KeyCode.F8));
 		}
 
 		private static void RegisterConfigKey<T>(string name, T defaultValue, Func<string, T> converter)
@@ -61,6 +63,18 @@ namespace TooManyOrbits
 			}
 			
 			configNode.Save(path);
+		}
+
+		private static T ParseEnum<T>(string value, T defaultValue)
+		{
+			try
+			{
+				return (T)Enum.Parse(typeof (T), value);
+			}
+			catch (Exception)
+			{
+				return defaultValue;
+			}
 		}
 	}
 }
