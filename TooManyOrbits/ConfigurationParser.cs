@@ -23,18 +23,33 @@ namespace TooManyOrbits
 			RegisterConfigKey(nameof(Configuration.HideVesselOrbits), true, Convert.ToBoolean);
 			RegisterConfigKey(nameof(Configuration.HideCelestialBodyIcons), true, Convert.ToBoolean);
 			RegisterConfigKey(nameof(Configuration.HideCelestialBodyOrbits), false, Convert.ToBoolean);
-			RegisterConfigKey(nameof(Configuration.ToggleKey), KeyCode.F8, s => ParseEnum(s, KeyCode.F8));
+			RegisterConfigKey(nameof(Configuration.ToggleKey), KeyCode.F8, s => (KeyCode)Enum.Parse(typeof(KeyCode), s));
 		}
 
 		private static void RegisterConfigKey<T>(string name, T defaultValue, Func<string, T> converter)
 		{
 			var property = typeof(Configuration).GetProperty(name);
+
+			Action<Configuration, string> propertySetter = (configuration, s) =>
+			{
+				T value;
+				try
+				{
+					value = converter(s);
+				}
+				catch (Exception)
+				{
+					value = defaultValue;
+				}
+				property.SetValue(configuration, value, null);
+			};
+
 			var key = new Key
 			{
 				Name = name,
 				DefaultValue = defaultValue.ToString(),
 				PropertyGetter = configuration => property.GetValue(configuration, null)?.ToString(),
-				PropertySetter = (configuration, s) => property.SetValue(configuration, converter(s), null),
+				PropertySetter = propertySetter,
 			};
 			Keys.Add(key);
 		}
@@ -63,18 +78,6 @@ namespace TooManyOrbits
 			}
 			
 			configNode.Save(path);
-		}
-
-		private static T ParseEnum<T>(string value, T defaultValue)
-		{
-			try
-			{
-				return (T)Enum.Parse(typeof (T), value);
-			}
-			catch (Exception)
-			{
-				return defaultValue;
-			}
 		}
 	}
 }
