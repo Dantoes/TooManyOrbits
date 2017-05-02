@@ -24,6 +24,8 @@ namespace TooManyOrbits
 		{
 			Logger.Info($"Starting {ModName} v{Version}...");
 
+			var resourceProvider = new ResourceProvider(ModName);
+
 			Logger.Debug("Loading configuration");
 			m_configuration = ConfigurationParser.LoadFromFile(ConfigurationFile);
 
@@ -37,7 +39,7 @@ namespace TooManyOrbits
 
 			// setup toolbar button
 			Logger.Debug("Creating toolbar button");
-			m_toolbarButton = new ToolbarButton($"{ModName}/ToolbarIcon");
+			m_toolbarButton = new ToolbarButton(resourceProvider);
 			m_toolbarButton.OnEnable += m_window.Show;
 			m_toolbarButton.OnDisable += m_window.Hide;
 

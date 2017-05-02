@@ -11,13 +11,9 @@ namespace TooManyOrbits.UI
 		private readonly Texture m_texture;
 		private ApplicationLauncherButton m_button;
 
-		public ToolbarButton(string iconPath)
+		public ToolbarButton(ResourceProvider resources)
 		{
-			m_texture = LoadTexture(iconPath);
-			if (m_texture == null)
-			{
-				Logger.Error("Incorrect icon path");
-			}
+			m_texture = resources.ToolbarIcon;
 		}
 
 		public void Dispose()
@@ -60,11 +56,6 @@ namespace TooManyOrbits.UI
 		private void DestroyButton(ApplicationLauncherButton button)
 		{
 			ApplicationLauncher.Instance.RemoveModApplication(button);
-		}
-
-		private Texture LoadTexture(string path)
-		{
-			return GameDatabase.Instance.GetTexture(path, false);
 		}
 	}
 }

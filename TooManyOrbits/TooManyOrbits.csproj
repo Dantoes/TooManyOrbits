@@ -50,6 +50,7 @@
     <Compile Include="Configuration.cs" />
     <Compile Include="ConfigurationParser.cs" />
     <Compile Include="IVisibilityController.cs" />
+    <Compile Include="ResourceProvider.cs" />
     <Compile Include="UI\ConfigurationWindow.cs" />
     <Compile Include="Experiments.cs" />
     <Compile Include="Filter\CelestialBodyFilter.cs" />
