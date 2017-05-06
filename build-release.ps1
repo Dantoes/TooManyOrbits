@@ -4,9 +4,12 @@ if(-not (Test-Path "TooManyOrbits.version"))
     exit
 }
 
-$avc = (Get-Content TooManyOrbits.version) | ConvertFrom-Json
+$avc = (Get-Content "TooManyOrbits.version") | ConvertFrom-Json
 $avcVersion = "{0}.{1}.{2}" -f $avc.VERSION.MAJOR, $avc.VERSION.MINOR, $avc.VERSION.PATCH
 $kspVersion = "{0}.{1}.{2}" -f $avc.KSP_VERSION.MAJOR, $avc.KSP_VERSION.MINOR, $avc.KSP_VERSION.PATCH
+
+$assemblyVersion = (findstr "^\[.*AssemblyVersion" "TooManyOrbits\Properties\AssemblyInfo.cs")|%{$_.split('"')[1]};
+$assemblyVersion = $assemblyVersion.Substring(0, $assemblyVersion.lastIndexOf('.')) # remove build version part
 
 $avcRemote = (Invoke-WebRequest -Uri "http://ksp-avc.cybutek.net/version.php?download&id=470").Content | ConvertFrom-Json
 $avcRemoteVersion = "{0}.{1}.{2}" -f $avcRemote.VERSION.MAJOR, $avcRemote.VERSION.MINOR, $avcRemote.VERSION.PATCH
@@ -19,16 +22,32 @@ $sdKspVersion = $sd.game_version
 Write-Host "Version info" -foregroundcolor green
 Write-Host 
 Write-Host "Version to publish:"
+Write-Host "  Assembly: " $assemblyVersion
 Write-Host "  TMO KSP-AVC: " $avcVersion
 Write-Host "  KSP Target: " $kspVersion
 Write-Host 
 Write-Host "Released Version:"
-Write-Host "  KSP-AVC TMO Version: " $avcVersion
-Write-Host "  KSP-AVC KSP Target: " $kspVersion
+Write-Host "  KSP-AVC TMO Version: " $avcRemoteVersion
+Write-Host "  KSP-AVC KSP Target: " $kspRemoteVersion
 Write-Host "  SpaceDock TMO Version: " $sdVersion
 Write-Host "  SpaceDock KSP Target: " $sdKspVersion
 Write-Host 
 
+# perform versioning plausibility tests
+if($assemblyVersion -ne $avcVersion)
+{
+    Write-Host "Error: Assembly version does not match KSP-AVC version" -ForegroundColor Red
+}
+
+if($avcRemoteVersion -ne $sdVersion)
+{
+    Write-Host "Error: SpaceDock version does not match published KSP-AVC version" -ForegroundColor Red
+}
+
+if($kspRemoteVersion -ne $sdKspVersion)
+{
+    Write-Host "Error: SpaceDock KSP version does not match published KSP-AVC version" -ForegroundColor Red
+}
 
 $doBuild = Read-Host "Create Release [Y/N]?"
 if($doBuild -ne "y" -and $doBuild -ne "Y")
