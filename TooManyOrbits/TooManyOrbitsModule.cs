@@ -41,7 +41,7 @@ namespace TooManyOrbits
 
 			// setup window
 			Logger.Debug("Creating window");
-			m_window = new ConfigurationWindow($"{ModName} Configuration", m_configuration, m_visibilityController, resourceProvider);
+			m_window = new ConfigurationWindow(ModName, m_configuration, m_visibilityController, resourceProvider);
 
 			// setup toolbar button
 			Logger.Debug("Creating toolbar button");
