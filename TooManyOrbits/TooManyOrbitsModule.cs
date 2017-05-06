@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Reflection;
 using TooManyOrbits.UI;
 using UnityEngine;
@@ -13,7 +14,7 @@ namespace TooManyOrbits
 		public const string ResourcePath = ModName + "/";
 
 		private string Version => Assembly.GetExecutingAssembly().GetName().Version.ToString();
-		private string ConfigurationFile => $"GameData/{ModName}/{ModName}.cfg";
+		private string ConfigurationFile => $"GameData/{ModName}/PluginData/{ModName}.cfg";
 
 		private KeyCode m_toggleButton;
 		private ToolbarButton m_toolbarButton;
@@ -71,6 +72,11 @@ namespace TooManyOrbits
 			m_toolbarButton.Dispose();
 
 			Logger.Debug("Writing configuration file");
+			string configurationDirectory = Path.GetDirectoryName(ConfigurationFile);
+			if (configurationDirectory != null && !Directory.Exists(configurationDirectory))
+			{
+				Directory.CreateDirectory(configurationDirectory);
+			}
 			ConfigurationParser.SaveToFile(ConfigurationFile, m_configuration);
 		}
 
