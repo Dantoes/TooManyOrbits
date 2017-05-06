@@ -64,12 +64,15 @@ namespace TooManyOrbits
 			MapView.OnEnterMapView -= OnEnterMapView;
 			MapView.OnExitMapView -= OnExitMapView;
 
+			Logger.Debug("Disposing ToolbarButton");
+			m_toolbarButton.Dispose();
+
+			Logger.Debug("Disposing window");
+			m_window.Dispose();
+
 			Logger.Debug("Disposing OrbitVisibilityController");
 			m_visibilityController.OnVisibilityChanged -= OnOrbitVisibilityChanged;
 			m_visibilityController.Dispose();
-
-			Logger.Debug("Disposing ToolbarButton");
-			m_toolbarButton.Dispose();
 
 			Logger.Debug("Writing configuration file");
 			string configurationDirectory = Path.GetDirectoryName(ConfigurationFile);

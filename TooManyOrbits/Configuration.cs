@@ -42,6 +42,11 @@ namespace TooManyOrbits
 			set { SetValue(ref m_toggleKey, value, nameof(ToggleKey)); }
 		}
 
+		// Window  position. Do not notify when changed
+		public int WindowPositionX { get; set; }
+		public int WindowPositionY { get; set; }
+
+
 		private void SetValue<T>(ref T field, T newValue, string propertyName)
 		{
 			if (!field?.Equals(newValue) ?? (object) field != (object)newValue)

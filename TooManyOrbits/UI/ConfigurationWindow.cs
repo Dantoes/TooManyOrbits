@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace TooManyOrbits.UI
 {
-	internal class ConfigurationWindow
+	internal class ConfigurationWindow : IDisposable
 	{
 		const int Width = 300;
-		const int Height = 200;
+		const int Height = 250;
 
 		private static readonly IList<KeyCode> AllowedKeyCodes = GetAllowedKeyCodes(); 
 
@@ -28,8 +28,13 @@ namespace TooManyOrbits.UI
 			m_title = title;
 			m_configuration = configuration;
 			m_visibilityController = visibilityController;
-			m_position = CalculateCenterPosition();
 			m_pencilTexture = resources.PencilIcon;
+			RestoreWindowPosition();
+		}
+
+		public void Dispose()
+		{
+			SaveWindowPosition();
 		}
 
 		public void Show()
@@ -75,7 +80,6 @@ namespace TooManyOrbits.UI
 			GUILayout.Space(20);
 			DrawKeyBinding();
 			GUILayout.EndVertical();
-
 
 			GUI.DragWindow();
 		}
@@ -146,6 +150,36 @@ namespace TooManyOrbits.UI
 			return null;
 		}
 
+		private void SaveWindowPosition()
+		{
+			m_configuration.WindowPositionX = Mathf.FloorToInt(m_position.xMin);
+			m_configuration.WindowPositionY = Mathf.FloorToInt(m_position.yMin);
+		}
+
+		private void RestoreWindowPosition()
+		{
+			int x = m_configuration.WindowPositionX;
+			int y = m_configuration.WindowPositionY;
+
+			if (x < 0 || y < 0) // position invalid or not set
+			{
+				m_position = CalculateCenterPosition();
+			}
+			else
+			{
+				m_position = new Rect(x, y, Width, Height);
+
+				if (m_position.xMax > Screen.width)
+				{
+					m_position.x = Screen.width - Width;
+				}
+				if (m_position.yMax > Screen.height)
+				{
+					m_position.y = Screen.height - Height;
+				}
+			}
+		}
+
 		private static IList<KeyCode> GetAllowedKeyCodes()
 		{
 			var keys = new List<KeyCode>(128);
@@ -162,5 +196,6 @@ namespace TooManyOrbits.UI
 
 			return keys;
 		}
+
 	}
 }

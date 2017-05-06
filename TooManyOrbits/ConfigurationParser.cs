@@ -24,6 +24,8 @@ namespace TooManyOrbits
 			RegisterConfigKey(nameof(Configuration.HideCelestialBodyIcons), true, Convert.ToBoolean);
 			RegisterConfigKey(nameof(Configuration.HideCelestialBodyOrbits), false, Convert.ToBoolean);
 			RegisterConfigKey(nameof(Configuration.ToggleKey), KeyCode.F8, s => (KeyCode)Enum.Parse(typeof(KeyCode), s));
+			RegisterConfigKey(nameof(Configuration.WindowPositionX), -1, Convert.ToInt32);
+			RegisterConfigKey(nameof(Configuration.WindowPositionY), -1, Convert.ToInt32);
 		}
 
 		private static void RegisterConfigKey<T>(string name, T defaultValue, Func<string, T> converter)
