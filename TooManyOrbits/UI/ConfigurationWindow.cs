@@ -6,8 +6,10 @@ namespace TooManyOrbits.UI
 {
 	internal class ConfigurationWindow : IDisposable
 	{
-		const int Width = 300;
-		const int Height = 250;
+		const int WidthMaximized = 300;
+		const int HeightMaximized = 250;
+		const int WidthMinimized = 80;
+		const int HeightMinimized = 35;
 
 		private static readonly IList<KeyCode> AllowedKeyCodes = GetAllowedKeyCodes(); 
 
@@ -16,12 +18,21 @@ namespace TooManyOrbits.UI
 		private readonly Configuration m_configuration;
 		private readonly IVisibilityController m_visibilityController;
 		private readonly Texture m_pencilTexture;
+		private readonly Texture m_toolbarTexture;
+		private readonly Texture m_greenToolbarTexture;
+		private readonly Texture m_moveTexture;
+		private readonly Texture m_expandTexture;
+		private readonly Texture m_retractTexture;
 
 		private GUIStyle m_textfieldStyle;
 		private bool m_visible = false;
 		private bool m_setKeyMode = false;
 		private Rect m_position;
+		private bool m_minimized;
 
+		private int Width => m_minimized ? WidthMinimized : WidthMaximized;
+		private int Height => m_minimized ? HeightMinimized : HeightMaximized;
+		private Texture ToolbarIcon => m_visibilityController.IsVisible ? m_toolbarTexture : m_greenToolbarTexture;
 
 		public ConfigurationWindow(string title, Configuration configuration, IVisibilityController visibilityController, ResourceProvider resources)
 		{
@@ -29,12 +40,17 @@ namespace TooManyOrbits.UI
 			m_configuration = configuration;
 			m_visibilityController = visibilityController;
 			m_pencilTexture = resources.PencilIcon;
-			RestoreWindowPosition();
+			m_toolbarTexture = resources.ToolbarIcon;
+			m_greenToolbarTexture = resources.GreenToolbarIcon;
+			m_moveTexture = resources.MoveIcon;
+			m_expandTexture = resources.ExpandIcon;
+			m_retractTexture = resources.RetractIcon;
+			RestoreConfiguration();
 		}
 
 		public void Dispose()
 		{
-			SaveWindowPosition();
+			SaveConfiguration();
 		}
 
 		public void Show()
@@ -47,6 +63,18 @@ namespace TooManyOrbits.UI
 			m_visible = false;
 		}
 
+		public void Minimize()
+		{
+			m_minimized = true;
+			RecalculateWindowPosition();
+		}
+
+		public void Maximize()
+		{
+			m_minimized = false;
+			RecalculateWindowPosition();
+		}
+
 		public void Draw()
 		{
 			if (m_visible)
@@ -57,13 +85,20 @@ namespace TooManyOrbits.UI
 
 		private void DrawWindow()
 		{
-			m_position = GUILayout.Window(m_windowId, m_position, DrawWindowContent, m_title);
+			if (m_minimized)
+			{
+				m_position = GUILayout.Window(m_windowId, m_position, DrawMinimizedWindow, string.Empty);
+			}
+			else
+			{
+				m_position = GUILayout.Window(m_windowId, m_position, DrawMaximizedWindow, m_title);
+			}
 		}
 
-		private void DrawWindowContent(int windowId)
+		private void DrawMaximizedWindow(int windowId)
 		{
 			GUILayout.BeginVertical();
-			DrawCloseButton();
+			DrawWindowButtons();
 
 			bool enabled = !m_visibilityController.IsVisible;
 			bool shouldEnable = GUILayout.Toggle(enabled, "Enabled");
@@ -80,6 +115,40 @@ namespace TooManyOrbits.UI
 			GUILayout.Space(20);
 			DrawKeyBinding();
 			GUILayout.EndVertical();
+
+			GUI.DragWindow();
+		}
+
+		private void DrawMinimizedWindow(int windowId)
+		{
+			const int windowPadding = 5;
+			const int buttonMargin = 5;
+
+			const int toggleButtonSize = 55;
+			const int controlButtonSize = 20;
+
+			const int contentWidth = 2 * windowPadding + toggleButtonSize - 20;
+			const int contentHeight = 2 * windowPadding + toggleButtonSize - 47;
+
+			// reserve space
+			GUILayoutUtility.GetRect(contentWidth, contentHeight);
+
+			var toggleButtonRect = new Rect(0, 0, toggleButtonSize, toggleButtonSize);
+			if (GUI.Button(toggleButtonRect, ToolbarIcon, GUIStyle.none))
+			{
+				m_visibilityController.Toggle();
+			}
+
+			var moveIconRect = new Rect(toggleButtonRect.xMax, toggleButtonRect.y + buttonMargin, controlButtonSize, controlButtonSize);
+			GUI.DrawTexture(moveIconRect, m_moveTexture);
+
+			const int maximizeButtonPadding = 5;
+			const int maximizeButtonSize = controlButtonSize - 2 * maximizeButtonPadding;
+			var maximizeButtonRect = new Rect(moveIconRect.x + maximizeButtonPadding, moveIconRect.yMax + buttonMargin + maximizeButtonPadding, maximizeButtonSize, maximizeButtonSize);
+			if (GUI.Button(maximizeButtonRect, m_expandTexture, GUIStyle.none))
+			{
+				Maximize();
+			}
 
 			GUI.DragWindow();
 		}
@@ -121,7 +190,7 @@ namespace TooManyOrbits.UI
 			GUILayout.EndHorizontal();
 		}
 
-		private void DrawCloseButton()
+		private void DrawWindowButtons()
 		{
 			const int offset = 5;
 			const int size = 20;
@@ -130,6 +199,12 @@ namespace TooManyOrbits.UI
 			if (GUI.Button(position, "X"))
 			{
 				Hide();
+			}
+
+			position.x -= size + offset;
+			if (GUI.Button(position, m_retractTexture))
+			{
+				Minimize();
 			}
 		}
 
@@ -150,17 +225,29 @@ namespace TooManyOrbits.UI
 			return null;
 		}
 
-		private void SaveWindowPosition()
+		private void SaveConfiguration()
 		{
 			m_configuration.WindowPositionX = Mathf.FloorToInt(m_position.xMin);
 			m_configuration.WindowPositionY = Mathf.FloorToInt(m_position.yMin);
+			m_configuration.WindowMinimized = m_minimized;
 		}
 
-		private void RestoreWindowPosition()
+		private void RestoreConfiguration()
 		{
+			m_minimized = m_configuration.WindowMinimized;
+
 			int x = m_configuration.WindowPositionX;
 			int y = m_configuration.WindowPositionY;
+			SetWindowPosition(x, y);
+		}
 
+		private void RecalculateWindowPosition()
+		{
+			SetWindowPosition((int)m_position.x, (int)m_position.y);
+		}
+
+		private void SetWindowPosition(int x, int y)
+		{
 			if (x < 0 || y < 0) // position invalid or not set
 			{
 				m_position = CalculateCenterPosition();
@@ -196,6 +283,5 @@ namespace TooManyOrbits.UI
 
 			return keys;
 		}
-
 	}
 }

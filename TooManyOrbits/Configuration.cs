@@ -42,9 +42,11 @@ namespace TooManyOrbits
 			set { SetValue(ref m_toggleKey, value, nameof(ToggleKey)); }
 		}
 
-		// Window  position. Do not notify when changed
+		// Window  properties. Do not notify when changed
 		public int WindowPositionX { get; set; }
 		public int WindowPositionY { get; set; }
+		public bool WindowMinimized { get; set; }
+
 
 
 		private void SetValue<T>(ref T field, T newValue, string propertyName)
