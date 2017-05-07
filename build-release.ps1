@@ -1,4 +1,9 @@
-if(-not (Test-Path "TooManyOrbits.version"))
+
+$root = $PSScriptRoot
+$avcFile = "$root\TooManyOrbits.version"
+$assemblyInfo = "$root\TooManyOrbits\Properties\AssemblyInfo.cs"
+
+if(-not (Test-Path "$avcFile"))
 {
     Write-Host "Incorrect working directory. Please run again from correct directory" -ForegroundColor Red
     exit
@@ -8,7 +13,7 @@ $avc = (Get-Content "TooManyOrbits.version") | ConvertFrom-Json
 $avcVersion = "{0}.{1}.{2}" -f $avc.VERSION.MAJOR, $avc.VERSION.MINOR, $avc.VERSION.PATCH
 $kspVersion = "{0}.{1}.{2}" -f $avc.KSP_VERSION.MAJOR, $avc.KSP_VERSION.MINOR, $avc.KSP_VERSION.PATCH
 
-$assemblyVersion = (findstr "^\[.*AssemblyVersion" "TooManyOrbits\Properties\AssemblyInfo.cs")|%{$_.split('"')[1]};
+$assemblyVersion = (findstr "^\[.*AssemblyVersion" "$assemblyInfo")|%{$_.split('"')[1]};
 $assemblyVersion = $assemblyVersion.Substring(0, $assemblyVersion.lastIndexOf('.')) # remove build version part
 
 $avcRemote = (Invoke-WebRequest -Uri "http://ksp-avc.cybutek.net/version.php?download&id=470").Content | ConvertFrom-Json
@@ -31,6 +36,7 @@ Write-Host "  KSP-AVC TMO Version: " $avcRemoteVersion
 Write-Host "  KSP-AVC KSP Target: " $kspRemoteVersion
 Write-Host "  SpaceDock TMO Version: " $sdVersion
 Write-Host "  SpaceDock KSP Target: " $sdKspVersion
+Write-Host 
 Write-Host 
 
 # perform versioning plausibility tests
@@ -57,7 +63,7 @@ if($doBuild -ne "y" -and $doBuild -ne "Y")
 
 # build VS project
 $msbuild = "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
-$project = "TooManyOrbits\TooManyOrbits.csproj"
+$project = "$root\TooManyOrbits\TooManyOrbits.csproj"
 
 Write-Host
 Write-Host "Building TooManyOrbits..." -foregroundcolor green
@@ -65,9 +71,11 @@ Write-Host "Building TooManyOrbits..." -foregroundcolor green
 
 
 # gather files to package
-$tmpDir = "Release\Temp"
-$pluginDir = "$tmpDir\GameData\TooManyOrbits"
-$buildDir = "TooManyOrbits\bin\Release"
+$outDir = "$root\Release"
+$tmpDir = "$outDir\Temp"
+$gameDataDir = "$tmpDir\GameData"
+$pluginDir = "$gameDataDir\TooManyOrbits"
+$buildDir = "$root\TooManyOrbits\bin\Release"
 if(Test-Path $tmpDir)
 {
     Remove-Item -Recurse -Force $tmpDir 
@@ -76,18 +84,19 @@ if(Test-Path $tmpDir)
 New-Item -ItemType Directory -Force -Path $pluginDir
 Copy-Item "$buildDir\TooManyOrbits.dll" $pluginDir
 Copy-Item "$buildDir\*.png" $pluginDir
-Copy-Item "TooManyOrbits.version" $pluginDir
-Copy-Item "LICENCE" "$pluginDir\LICENCE.txt"
+Copy-Item "$avcFile" $pluginDir
+Copy-Item "$root\LICENCE" "$pluginDir\LICENCE.txt"
 
 # create release archive
-$releaseFile = "Release\TooManyOrbits-$avcVersion.zip"
+$releaseFile = "$outDir\TooManyOrbits-$avcVersion.zip"
 if(Test-Path $releaseFile)
 {
     Remove-Item -Force $releaseFile 
 }
 
 Add-Type -assembly "system.io.compression.filesystem"
-[io.compression.zipfile]::CreateFromDirectory($pluginDir, $releaseFile) 
+$compressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
+[io.compression.zipfile]::CreateFromDirectory($gameDataDir, $releaseFile, $compressionLevel, $True) 
 
 
 # cleanup
