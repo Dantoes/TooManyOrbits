@@ -7,7 +7,11 @@ namespace TooManyOrbits
 		private readonly string m_resourcePath;
 
 		public Texture ToolbarIcon => LoadTextureResource("ToolbarIcon");
+		public Texture GreenToolbarIcon => LoadTextureResource("ToolbarIcon-Green");
 		public Texture PencilIcon => LoadTextureResource("Pencil");
+		public Texture ExpandIcon => LoadTextureResource("Expand");
+		public Texture RetractIcon => LoadTextureResource("Retract");
+		public Texture MoveIcon => LoadTextureResource("Move");
 
 		public ResourceProvider(string resourcePath)
 		{
