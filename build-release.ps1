@@ -39,6 +39,11 @@ Write-Host "  SpaceDock KSP Target: " $sdKspVersion
 Write-Host 
 Write-Host 
 
+Write-Host "!!! CKAN can not handle zip files created by this script !!!" -ForegroundColor Red
+Write-Host "!!! Do not publish !!!" -ForegroundColor Red
+
+
+
 # perform versioning plausibility tests
 if($assemblyVersion -ne $avcVersion)
 {
@@ -95,7 +100,7 @@ if(Test-Path $releaseFile)
 }
 
 Add-Type -assembly "system.io.compression.filesystem"
-$compressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
+$compressionLevel = [System.IO.Compression.CompressionLevel]::Fastest
 [io.compression.zipfile]::CreateFromDirectory($gameDataDir, $releaseFile, $compressionLevel, $True) 
 
 
