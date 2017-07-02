@@ -4,7 +4,7 @@
 	{
 		public bool Accept(CelestialBody obj)
 		{
-			var targetedCelestialBody = FlightGlobals.ActiveVessel.targetObject?.GetOrbitDriver().celestialBody;
+			var targetedCelestialBody = FlightGlobals.ActiveVessel?.targetObject?.GetOrbitDriver()?.celestialBody;
 			if (obj == targetedCelestialBody)
 			{
 				return false;
