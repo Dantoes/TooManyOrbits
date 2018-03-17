@@ -124,7 +124,7 @@ namespace TooManyOrbits.UI
 			const int windowPadding = 5;
 			const int buttonMargin = 5;
 
-			const int toggleButtonSize = 55;
+			const int toggleButtonSize = 50;
 			const int controlButtonSize = 20;
 
 			const int contentWidth = 2 * windowPadding + toggleButtonSize - 20;
