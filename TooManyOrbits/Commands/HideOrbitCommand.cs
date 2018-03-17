@@ -2,14 +2,14 @@
 {
 	internal class HideOrbitCommand : ICommand
 	{
-		private readonly OrbitRenderer m_renderer;
+		private readonly OrbitRendererBase m_renderer;
 		private readonly bool m_hideIcon;
 		private readonly bool m_hideOrbit;
 
 		private readonly OrbitRenderer.DrawIcons m_originalIconMode;
 		private readonly OrbitRenderer.DrawMode m_originalOrbitMode;
 
-		public HideOrbitCommand(OrbitRenderer renderer, bool hideIcon, bool hideOrbit)
+		public HideOrbitCommand(OrbitRendererBase renderer, bool hideIcon, bool hideOrbit)
 		{
 			m_renderer = renderer;
 			m_hideIcon = hideIcon;
